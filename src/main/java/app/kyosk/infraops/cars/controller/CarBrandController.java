@@ -3,7 +3,6 @@ package app.kyosk.infraops.cars.controller;
 import app.kyosk.infraops.cars.dto.CarBrandDTO;
 import app.kyosk.infraops.cars.dto.PagedResponse;
 import app.kyosk.infraops.cars.services.CarBrandService;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
