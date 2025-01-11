@@ -2,11 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: infraops-postgres
+  namespace: infraops-namespace
 spec:
   selector:
     app: infraops-postgres
   ports:
     - protocol: TCP
-      port: 5434
-      targetPort: 5434
+      port: 5432        # Changed to default PostgreSQL port
+      targetPort: 5432  # Changed to match container port
   type: ClusterIP

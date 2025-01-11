@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: infraops-postgres
+  namespace: infraops-namespace
 spec:
   replicas: 1
   selector:
@@ -16,7 +17,7 @@ spec:
         - name: infraops-postgres
           image: postgres:latest
           ports:
-            - containerPort: 5434
+            - containerPort: 5432  # Changed to default PostgreSQL port
           env:
             - name: POSTGRES_DB
               value: infraops
@@ -27,6 +28,11 @@ spec:
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "admin", "-p", "5432"]  # Updated port
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: postgres-data
           persistentVolumeClaim:

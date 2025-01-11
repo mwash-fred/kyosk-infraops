@@ -14,7 +14,7 @@ public class PageLinks {
 
     public static PageLinks from(Page<?> page, String baseUrl) {
         PageLinks links = new PageLinks();
-        baseUrl = baseUrl.substring(0, baseUrl.indexOf('?'));
+        baseUrl = baseUrl.contains("?") ? baseUrl.substring(0, baseUrl.indexOf('?')) : baseUrl;
         baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         links.setFirst(String.format("%s?page=0&size=%d", baseUrl, page.getSize()));
         links.setSelf(String.format("%s?page=%d&size=%d", baseUrl, page.getNumber(), page.getSize()));
