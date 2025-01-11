@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: infraops
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/infraops
+    username: ${DCPIT_POSTGRES_USER:admin}
+    password: ${DCPIT_POSTGRES_PASSWORD:maarifa}
