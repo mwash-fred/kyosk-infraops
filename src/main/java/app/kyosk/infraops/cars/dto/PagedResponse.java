@@ -12,12 +12,16 @@ public record PagedResponse<T>(
         int totalPages,
         boolean last,
         String nextLink,
-        String prevLink
+        String prevLink,
+        String firstLink,
+        String lastLink
 ) {
 
     public static <T> PagedResponse<T> fromPage(Page<T> page, String baseUrl) {
         String nextLink = page.hasNext() ? baseUrl + "?page=" + (page.getNumber() + 1) + "&size=" + page.getSize() : null;
         String prevLink = page.hasPrevious() ? baseUrl + "?page=" + (page.getNumber() - 1) + "&size=" + page.getSize() : null;
+        String firstLink = baseUrl + "?page=0&size=" + page.getSize();
+        String lastLink = baseUrl + "?page=" + (page.getTotalPages() - 1) + "&size=" + page.getSize();
         return new PagedResponse<>(
                 page.getContent(),
                 page.getNumber(),
@@ -26,7 +30,9 @@ public record PagedResponse<T>(
                 page.getTotalPages(),
                 page.isLast(),
                 nextLink,
-                prevLink
+                prevLink,
+                firstLink,
+                lastLink
         );
     }
 }
