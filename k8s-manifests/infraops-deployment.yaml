@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infraops-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: infraops-app
+  template:
+    metadata:
+      labels:
+        app: infraops-app
+    spec:
+      containers:
+        - name: infraops-app
+          image: codex254/infraops:0.0.1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://infraops-postgres:5434/infraops
+            - name: SPRING_DATASOURCE_USERNAME
+              value: admin
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: admin

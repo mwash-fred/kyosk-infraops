@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infraops-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: infraops-postgres
+  template:
+    metadata:
+      labels:
+        app: infraops-postgres
+    spec:
+      containers:
+        - name: infraops-postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5434
+          env:
+            - name: POSTGRES_DB
+              value: infraops
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: admin
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
