@@ -24,7 +24,7 @@ public class CarBrandController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<CarBrandDTO>> getAllPaged(Pageable pageable) {
-        return ResponseEntity.ok(PagedResponse.fromPage(carBrandService.findAll(pageable),  ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString()));
+        return ResponseEntity.ok(PagedResponse.from(carBrandService.findAll(pageable),  ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString()));
     }
 
     @GetMapping("{uuid}")
