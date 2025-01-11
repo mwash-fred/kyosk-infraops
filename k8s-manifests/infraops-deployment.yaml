@@ -24,4 +24,3 @@ spec:
               value: admin
             - name: SPRING_DATASOURCE_PASSWORD
               value: admin
-
