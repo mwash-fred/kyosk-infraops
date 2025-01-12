@@ -1,97 +1,155 @@
-# InfraOps Project - Kubernetes Deployment with CI/CD
+# InfraOps Kubernetes Deployment with CI/CD Pipeline
 
-## 📦 Project Overview
-This project demonstrates a **Spring Boot** backend service deployed on **Minikube** using **Kubernetes**. It also includes a **PostgreSQL** database configured to run on port **5232**, managed with **Kubernetes manifests** and automated using **GitHub Actions** for CI/CD.
-
----
-
-## 🎯 Objectives
-- **Application:** Spring Boot REST API with a `/health` endpoint.
-- **Database:** PostgreSQL (running on port **5232** externally, **5432** internally).
-- **Containerization:** Dockerized using a `Dockerfile`.
-- **CI/CD Automation:** GitHub Actions to build and deploy the Docker image.
-- **Kubernetes Deployment:** Minikube with YAML manifests.
+This documentation provides a step-by-step guide for setting up, containerizing, and deploying a Spring Boot application using Minikube and Kubernetes. I have also included a GitHub Actions CI/CD pipeline for automated builds and Docker image uploads to Docker Hub.
 
 ---
 
-## 📁 Project Structure
-```
-.
-├── gradle/                          # Gradle build system
-├── src/                             # Application source code
-├── Dockerfile                      # For containerizing the application
-├── docker-compose.yml              # Optional for local testing with Compose
-├── k8s-manifests/                  # Kubernetes YAML manifests
-│   ├── infraops-deployment.yaml
-│   ├── infraops-service.yaml
-│   ├── namespace.yaml
-│   ├── postgres-service.yaml
-│   └── pvc.yaml
-├── .github/workflows/docker-build.yml  # GitHub Actions for CI/CD
-├── README.md                       # This documentation file
-```
+## 📦 Objective
+My goal for this project is to:
+- **Containerize** the application using a `Dockerfile`.
+- **Automate CI/CD** with GitHub Actions.
+- **Deploy the Application** to a Minikube cluster using Kubernetes manifests.
+- **Ensure Accessibility** via a NodePort service.
 
 ---
 
-## 🚀 Getting Started
+## 📦 Step 1: Clone the GitHub Repository
+To get started, clone the GitHub repository containing the InfraOps project:
 
-### ✅ Prerequisites:
-- **Docker**
-- **Minikube**
-- **Kubectl**
-- **PostgreSQL Client**
-
-### ✅ Clone the Repository
 ```bash
-git clone <repo-url>
-cd infraops
+git clone https://github.com/mwash-fred/kyosk-infraops.git
+cd kyosk-infraops
 ```
 
-### ✅ Start Minikube
+---
+
+## 📂 Project Structure
+```plaintext
+k8s-manifests/
+├── infraops-deployment.yaml
+├── infraops-service.yaml
+├── namespace.yaml
+├── postgres-deployment.yaml
+├── postgres-service.yaml
+├── pvc.yaml
+src/
+├── Dockerfile
+├── build.gradle
+```
+
+---
+
+## 🚀 Prerequisites
+Ensure you have the following installed and configured:
+- [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [Docker](https://docs.docker.com/get-docker/)
+
+---
+
+## 📦 Step 2: Build the Docker Image
+I created the following `Dockerfile` to containerize the Spring Boot application. GitHub Actions takes care of this as shown in the screenshot below.
+
+```dockerfile
+# Use the official Gradle image with JDK 21 for the build stage
+FROM gradle:8.5-jdk21 AS build
+
+WORKDIR /app
+
+# Copy all project files
+COPY . .
+
+# Build the application using Gradle, skipping tests for faster build
+RUN gradle clean build -x test
+
+# Use Eclipse Temurin JDK for the runtime stage
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+# Copy the JAR from the build stage
+COPY --from=build /app/build/libs/*.jar infraops.jar
+
+# Expose port
+EXPOSE 8080
+
+# Run the JAR file
+ENTRYPOINT ["java", "-jar", "infraops.jar"]
+```
+
+---
+
+## 📦 Step 3: Kubernetes Setup with Minikube
+### Start Minikube:
 ```bash
 minikube start
 ```
 
-### ✅ Apply Kubernetes Manifests
+### Verify Minikube Setup:
 ```bash
-kubectl apply -f k8s-manifests/namespace.yaml
-kubectl apply -f k8s-manifests/pvc.yaml
-kubectl apply -f k8s-manifests/postgres-deployment.yaml
-kubectl apply -f k8s-manifests/postgres-service.yaml
-kubectl apply -f k8s-manifests/infraops-deployment.yaml
-kubectl apply -f k8s-manifests/infraops-service.yaml
-```
-
-### ✅ Verify Pod and Service Status
-```bash
-kubectl get pods -n infraops-namespace
-kubectl get services -n infraops-namespace
-```
-
-### ✅ Expose the Application
-```bash
-minikube service infraops-service -n infraops-namespace
-```
-
-### ✅ Access PostgreSQL from Local Machine
-```bash
-minikube service infraops-postgres -n infraops-namespace --url
-psql -h <minikube-ip> -p 5232 -U admin -d your_database
+kubectl get nodes
 ```
 
 ---
 
-## 📦 CI/CD Pipeline (GitHub Actions)
+## 📦 Step 4: Deploy Kubernetes Resources
+I have created multiple Kubernetes manifests for both the InfraOps application and the PostgreSQL database.
 
-### ✅ **Workflow Summary:**
-1. **Triggers:** On `push` to the `main` branch.
-2. **Steps:**
-    - Checkout Code
-    - Build the Docker Image
-    - Push the Image to **Docker Hub**
-    - Apply Kubernetes Manifests
+### Apply Namespace:
+```bash
+kubectl apply -f k8s-manifests/namespace.yaml
+```
 
-### ✅ **`.github/workflows/docker-build.yml` CI/CD Pipeline:**
+### Apply Persistent Volume Claim (PVC):
+```bash
+kubectl apply -f k8s-manifests/pvc.yaml
+```
+
+### Deploy PostgreSQL:
+```bash
+kubectl apply -f k8s-manifests/postgres-deployment.yaml
+kubectl apply -f k8s-manifests/postgres-service.yaml
+```
+
+### Deploy InfraOps Application:
+```bash
+kubectl apply -f k8s-manifests/infraops-deployment.yaml
+kubectl apply -f k8s-manifests/infraops-service.yaml
+```
+
+---
+
+## 📦 Step 5: Verify the Deployment
+### Check Running Pods and Services:
+```bash
+kubectl get pods -n infraops-namespace
+kubectl get svc -n infraops-namespace
+```
+
+### Get the Service URL:
+```bash
+minikube service infraops-service -n infraops-namespace --url
+```
+
+---
+
+## 📦 Step 6: Accessing the Application
+I accessed the deployed application using the service URL provided by Minikube. For example:
+
+```plaintext
+[http://192.168.49.2:30000/api/v1/car-brands](http://192.168.49.2:30000/api/v1/car-brands)
+```
+Please use the service URL provided by Minikube and add the following endpoint `/api/v1/car-brands`.
+
+### ✅ Screenshot: Application Output
+(Attach your screenshot here)
+
+---
+
+## 📦 Step 7: CI/CD Automation with GitHub Actions
+I have automated the build and deployment process using GitHub Actions. The pipeline builds the Docker image and pushes it to Docker Hub whenever I push to the `main` branch.
+
+### `.github/workflows/main.yml`
 ```yaml
 name: Build and Push Docker Image
 
@@ -102,9 +160,11 @@ on:
 
 jobs:
   build_and_push:
+    name: Build and Push Docker Image to Docker Hub
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Login to Docker Hub
@@ -120,41 +180,49 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/infraops:0.0.1
+
+      - name: Logout from Docker Hub
+        run: docker logout
 ```
 
-### ✅ **Adding GitHub Secrets:**
-- `DOCKER_HUB_USERNAME`: Your Docker Hub Username
-- `DOCKER_HUB_PASSWORD`: Your Docker Hub Personal Access Token
+### ✅ Screenshot: GitHub Actions Pipeline Result
+(Attach your screenshot here)
 
 ---
 
-## 📦 Design Decisions & Justifications
-
-1. **Minikube for Local Kubernetes Testing:**
-    - Minikube provides a local Kubernetes environment ideal for testing before cloud deployments.
-
-2. **Namespace Usage:**
-    - Resources are isolated using the `infraops-namespace` to avoid conflicts with other services.
-
-3. **Database Port Mapping:**
-    - PostgreSQL runs internally on **port 5432** and is exposed as **5232** for local testing.
-
-4. **CI/CD with GitHub Actions:**
-    - Automates the build, push, and deployment process to ensure consistency.
+## 📦 Step 8: Troubleshooting
+- **Pods Not Starting:** Check the logs using `kubectl logs <pod-name>`.
+- **Service Not Accessible:** Ensure the NodePort is correctly configured and within the valid range `30000-32767`.
+- **Database Connectivity:** Ensure both the PostgreSQL and InfraOps deployments are in the same namespace.
 
 ---
 
-## ✅ Troubleshooting
-
-### **Check Pod Logs:**
+## 📦 Step 9: Cleanup Process
+To delete all Kubernetes resources and stop Minikube, run:
 ```bash
-kubectl logs -n infraops-namespace -l app=infraops-app
-kubectl logs -n infraops-namespace -l app=infraops-postgres
+kubectl delete -f k8s-manifests/
+minikube stop
+minikube delete
 ```
 
-### **Delete and Reapply Resources:**
-```bash
-kubectl delete -f k8s-manifests/ --namespace=infraops-namespace
-kubectl apply -f k8s-manifests/
-```
+---
+
+## 📦 Deliverables Summary
+- ✅ **Source Code:** Minimal Spring Boot application.
+- ✅ **Dockerfile:** For containerization.
+- ✅ **Kubernetes Manifests:** For Minikube deployment.
+- ✅ **CI/CD Pipeline:** Automated with GitHub Actions.
+- ✅ **Screenshots:** To validate successful deployment.
+
+---
+
+## ✅ Conclusion
+I successfully containerized and deployed a Spring Boot application using Minikube and Kubernetes. The CI/CD pipeline automates the process by building and pushing the Docker image to Docker Hub.
+
+---
+
+### 📸 Screenshots Used:
+1. Application Output (Browser)
+2. GitHub Actions Pipeline Result
+3. Minikube Service Verification
 
