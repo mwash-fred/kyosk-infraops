@@ -49,6 +49,7 @@ Ensure you have the following installed and configured:
 
 ## 📦 Step 2: Build the Docker Image
 I created the following `Dockerfile` to containerize the Spring Boot application. GitHub Actions takes care of this as shown in the screenshot below.
+![Screenshot from 2025-01-13 01-59-44.png](screenshots/Screenshot%20from%202025-01-13%2001-59-44.png)
 
 ```dockerfile
 # Use the official Gradle image with JDK 21 for the build stage
@@ -94,6 +95,7 @@ kubectl get nodes
 
 ## 📦 Step 4: Deploy Kubernetes Resources
 I have created multiple Kubernetes manifests for both the InfraOps application and the PostgreSQL database.
+![Screenshot from 2025-01-13 01-44-55.png](screenshots/Screenshot%20from%202025-01-13%2001-44-55.png)
 
 ### Apply Namespace:
 ```bash
@@ -136,13 +138,15 @@ minikube service infraops-service -n infraops-namespace --url
 ## 📦 Step 6: Accessing the Application
 I accessed the deployed application using the service URL provided by Minikube. For example:
 
+![Screenshot from 2025-01-13 01-57-00.png](screenshots/Screenshot%20from%202025-01-13%2001-57-00.png)
+
 ```plaintext
 [http://192.168.49.2:30000/api/v1/car-brands](http://192.168.49.2:30000/api/v1/car-brands)
 ```
 Please use the service URL provided by Minikube and add the following endpoint `/api/v1/car-brands`.
 
 ### ✅ Screenshot: Application Output
-(Attach your screenshot here)
+![Screenshot from 2025-01-13 01-57-00.png](screenshots/Screenshot%20from%202025-01-13%2001-57-00.png)
 
 ---
 
