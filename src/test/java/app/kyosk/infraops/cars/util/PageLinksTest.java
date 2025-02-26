@@ -118,4 +118,64 @@ class PageLinksTest {
         assertNull(pageLinks.getNext());  // No next page
         assertEquals("http://example.com/cars?page=2&size=5", pageLinks.getLast());
     }
+
+    @Test
+    void testFromWithUrlContainingQueryParameters() {
+        // Mock a page with query parameters in the URL
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        Page<String> mockPage = new PageImpl<>(Arrays.asList("Car1", "Car2", "Car3"), pageRequest, 15);
+
+        // URL with query parameters
+        String urlWithParams = "http://example.com/cars?param=value&another=123";
+
+        // Call the method
+        PageLinks pageLinks = PageLinks.from(mockPage, urlWithParams);
+
+        // Assertions - verify that query params were removed
+        assertEquals("http://example.com/cars?page=0&size=5", pageLinks.getFirst());
+        assertEquals("http://example.com/cars?page=0&size=5", pageLinks.getSelf());
+        assertNull(pageLinks.getPrevious());
+        assertEquals("http://example.com/cars?page=1&size=5", pageLinks.getNext());
+        assertEquals("http://example.com/cars?page=2&size=5", pageLinks.getLast());
+    }
+
+    @Test
+    void testFromWithUrlEndingWithSlash() {
+        // Mock a page with URL ending with slash
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        Page<String> mockPage = new PageImpl<>(Arrays.asList("Car1", "Car2", "Car3"), pageRequest, 15);
+
+        // URL ending with slash
+        String urlWithSlash = "http://example.com/cars/";
+
+        // Call the method
+        PageLinks pageLinks = PageLinks.from(mockPage, urlWithSlash);
+
+        // Assertions - verify that trailing slash was removed
+        assertEquals("http://example.com/cars?page=0&size=5", pageLinks.getFirst());
+        assertEquals("http://example.com/cars?page=0&size=5", pageLinks.getSelf());
+        assertNull(pageLinks.getPrevious());
+        assertEquals("http://example.com/cars?page=1&size=5", pageLinks.getNext());
+        assertEquals("http://example.com/cars?page=2&size=5", pageLinks.getLast());
+    }
+
+    @Test
+    void testFromWithUrlContainingBothQueryParamsAndSlash() {
+        // Mock a page with URL having both query params and ending with slash
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        Page<String> mockPage = new PageImpl<>(Arrays.asList("Car1", "Car2", "Car3"), pageRequest, 15);
+
+        // URL with both query params and trailing slash
+        String complexUrl = "http://example.com/cars/?param=value";
+
+        // Call the method
+        PageLinks pageLinks = PageLinks.from(mockPage, complexUrl);
+
+        // Assertions - verify both issues were fixed
+        assertEquals("http://example.com/cars?page=0&size=5", pageLinks.getFirst());
+        assertEquals("http://example.com/cars?page=0&size=5", pageLinks.getSelf());
+        assertNull(pageLinks.getPrevious());
+        assertEquals("http://example.com/cars?page=1&size=5", pageLinks.getNext());
+        assertEquals("http://example.com/cars?page=2&size=5", pageLinks.getLast());
+    }
 }
