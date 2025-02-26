@@ -95,4 +95,27 @@ class PageLinksTest {
         assertNull(pageLinks.getNext());  // No next page
         assertEquals("http://example.com/cars?page=2&size=5", pageLinks.getLast());
     }
+
+    @Test
+    void testFromWithNoNextPage() {
+        // Mock a page with 10 items, on page 2 (last page) with 5 items per page, no next page
+        PageRequest pageRequest = PageRequest.of(2, 5);
+        Page<String> mockPage = new PageImpl<>(Arrays.asList("Car11", "Car12", "Car13", "Car14", "Car15"), pageRequest, 15);
+
+        when(page.getSize()).thenReturn(5);
+        when(page.getNumber()).thenReturn(2);
+        when(page.hasPrevious()).thenReturn(true);
+        when(page.hasNext()).thenReturn(false);
+        when(page.getTotalPages()).thenReturn(3);
+
+        // Call the method
+        PageLinks pageLinks = PageLinks.from(mockPage, BASE_URL);
+
+        // Assertions
+        assertEquals("http://example.com/cars?page=0&size=5", pageLinks.getFirst());
+        assertEquals("http://example.com/cars?page=2&size=5", pageLinks.getSelf());
+        assertEquals("http://example.com/cars?page=1&size=5", pageLinks.getPrevious());
+        assertNull(pageLinks.getNext());  // No next page
+        assertEquals("http://example.com/cars?page=2&size=5", pageLinks.getLast());
+    }
 }
