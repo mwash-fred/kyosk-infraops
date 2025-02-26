@@ -5,10 +5,19 @@ import app.kyosk.infraops.cars.entity.CarBrand;
 import app.kyosk.infraops.cars.repository.CarBrandRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.data.domain.*;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -84,7 +93,7 @@ class CarBrandServiceImplTest {
         // Assertions
         assertNotNull(carBrandDTOs);
         assertEquals(1, carBrandDTOs.size());
-        assertEquals(carBrandEntity.getName(), carBrandDTOs.get(0).name());
+        assertEquals(carBrandEntity.getName(), carBrandDTOs.getFirst().name());
     }
 
     @Test
@@ -102,7 +111,7 @@ class CarBrandServiceImplTest {
         // Assertions
         assertNotNull(carBrandDTOs);
         assertEquals(1, carBrandDTOs.getContent().size());
-        assertEquals(carBrandEntity.getName(), carBrandDTOs.getContent().get(0).name());
+        assertEquals(carBrandEntity.getName(), carBrandDTOs.getContent().getFirst().name());
     }
 
     @Test
@@ -139,8 +148,7 @@ class CarBrandServiceImplTest {
     void testUpdate() {
         UUID uuid = UUID.randomUUID();
         CarBrand existingCarBrand = createCarBrand(uuid);
-        CarBrandDTO updatedCarBrandDTO = createCarBrandDTO(uuid);
-        updatedCarBrandDTO = new CarBrandDTO(
+        CarBrandDTO updatedCarBrandDTO = new CarBrandDTO(
                 uuid,
                 "UpdatedBrand",
                 "UpdatedCountry",
