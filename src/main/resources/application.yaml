@@ -3,6 +3,6 @@ spring:
     name: infraops
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/infraops
+    url: jdbc:postgresql://localhost:5432/infraops
     username: ${DCPIT_POSTGRES_USER:admin}
     password: ${DCPIT_POSTGRES_PASSWORD:maarifa}

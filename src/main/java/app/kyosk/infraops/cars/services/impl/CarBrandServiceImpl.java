@@ -33,7 +33,7 @@ public class CarBrandServiceImpl implements CarBrandService {
     public List<CarBrandDTO> findAll() {
         return carBrandRepository.findAll().stream()
                 .map(this::mapToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

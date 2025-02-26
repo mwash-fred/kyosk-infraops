@@ -1,7 +1,6 @@
 package app.kyosk.infraops.cars.services;
 
 import app.kyosk.infraops.cars.dto.CarBrandDTO;
-import app.kyosk.infraops.cars.entity.CarBrand;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
