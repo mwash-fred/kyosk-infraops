@@ -45,6 +45,11 @@ test{
 	finalizedBy jacocoTestReport
 }
 
+def testCoverageExcludes = [
+		"**/InfraopsApplication.java",
+		"**/test/**"
+]
+
 jacocoTestReport {
 	dependsOn test
 	reports {
@@ -52,6 +57,11 @@ jacocoTestReport {
 		csv.required = false
 		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 	}
+	classDirectories.setFrom(
+			sourceSets.main.output.classesDirs.asFileTree.matching {
+				exclude(testCoverageExcludes)
+			}
+	)
 }
 
 def sonarExclusions = [
