@@ -63,5 +63,6 @@ sonar {
 		property "sonar.tests", "src/test/java"
 		property "sonar.host.url", "http://localhost:9000"
 		property "sonar.token", "sqp_c8aba200a97315798f92fd88f3143ab14c4655e5"
+		property "sonar.exclusions", "app.kyosk.infraops.InfraopsApplication.java"
 	}
 }
