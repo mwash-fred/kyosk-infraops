@@ -46,7 +46,7 @@ test{
 }
 
 def testCoverageExcludes = [
-		"**/InfraopsApplication.java",
+		"**/InfraopsApplication.class",
 		"**/test/**"
 ]
 
